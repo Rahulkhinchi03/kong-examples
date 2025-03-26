@@ -16,7 +16,7 @@
 
 ## API Intelligence Platform
 
-Treblle is an federated API intelligence platform that helps organization understand their entire API Landscape in less than 60 seconds.
+Treblle is a federated API intelligence platform that helps organization understand their entire API Landscape in less than 60 seconds.
 
 <div align="center">
 <a href="https://treblle.com/product/api-observability" target="_blank">API Intelligence</a>
@@ -37,9 +37,9 @@ Treblle is an federated API intelligence platform that helps organization unders
 </div>
 
 
-# Kong Gateway Plugin for Treblle - macOS Installation Guide
+# Kong Gateway Plugin for Treblle
 
-The Kong API Gateway plugin for Treblle captures API requests in real-time and sends that data to Treblle for monitoring and analysis.
+The Kong API Gateway plugin for Treblle captures API requests in real time and sends that data to Treblle for monitoring and analysis.
 
 ### What Treblle Helps You With:
 
@@ -52,12 +52,21 @@ The Kong API Gateway plugin for Treblle captures API requests in real-time and s
 - Test your APIs in a fast and easy way
 - And much more
 
-## Installation on macOS Using Docker
+### Terminology
+- `plugin`: a plugin executing actions inside Kong before or after a request has been proxied to the upstream API.
+- `Service`: the Kong entity representing an external upstream API or microservice.
+- `Route`: The Kong entity represents a way to map downstream requests to upstream services.
+- `Consumer`: the Kong entity representing a developer or machine using the API. When using Kong, a Consumer only communicates with Kong which proxies every call to the said upstream API.
+- `Credential`: a unique string associated with a Consumer, also referred to as an API key.
+upstream service: this refers to your own API/service sitting behind Kong, to which client requests are forwarded.
+- `API`: a legacy entity representing your upstream services. Deprecated in favor of Services since CE 0.13.0 and EE 0.32.
+
+# Installation on macOS Using Docker
 
 ### Prerequisites
 - Docker Desktop installed on your Mac
 - Git installed
-- A Treblle account with API key and Project ID
+- A Treblle account with an API key and Project ID
 
 ### Step 1: Clone the Repository
 ```bash
@@ -66,23 +75,38 @@ cd treblle-kong
 ```
 
 ### Step 2: Build the Docker Image
+
+We'll use the [Dockerfile](https://github.com/Treblle/treblle-kong/blob/main/Dockerfile) in the plugin folder to build a custom image of Kong with the Treblle plugin enabled:
+
 ```bash
 docker build -t k:v1 .
 ```
 
+This creates a custom Kong image tagged as "k" with the installed Treblle plugin.
+
 ### Step 3: Start the Container
+
+Run Docker Compose to start the Kong container with the plugin:
+
 ```bash
 docker-compose up -d
 ```
+After this step, your Kong Gateway should be up and running with the Treblle plugin enabled.
 
 ## Configuration Using Curl
 
 ### 1. Verify Plugin is Enabled
+
+Read the [Plugin Reference](https://docs.konghq.com/gateway-oss/2.4.x/admin-api/#add-plugin) and the [Plugin Precedence](https://docs.konghq.com/gateway-oss/2.4.x/admin-api/#precedence) sections for more information.
+
 ```bash
 curl -i -X GET http://localhost:8001/plugins/enabled
 ```
 
 ### 2. Create a Service
+
+Configure this plugin on a [Service](https://docs.konghq.com/gateway-oss/2.4.x/admin-api/#service-object) by making the following request on your Kong server:
+
 ```bash
 curl -i -X POST http://localhost:8001/services \
   --data "name=httpbin-service" \
@@ -90,6 +114,9 @@ curl -i -X POST http://localhost:8001/services \
 ```
 
 ### 3. Create a Route
+
+Configure this plugin on a [Route](https://docs.konghq.com/gateway-oss/2.4.x/admin-api/#route-object) with:
+
 ```bash
 curl -i -X POST http://localhost:8001/services/httpbin-service/routes \
   --data "name=httpbin-route-post" \
@@ -98,10 +125,16 @@ curl -i -X POST http://localhost:8001/services/httpbin-service/routes \
 ```
 
 ### 4. Create an API on Treblle and Get Credentials
+
+First, you need to create an API on the Treblle platform to get your API key and Project ID, which will be used to configure the plugin in the next step.
+
 - Visit the [Treblle](treblle.com) Dashboard to create a new API
 - Note your `TREBLLE_API_KEY` and `TREBLLE_PROJECT_ID`
 
 ### 5. Add Treblle Plugin to Service
+
+The `mask_keywords` are the sensitive data fields that will be masked before being sent to Treblle. This important security feature protects sensitive information in your API traffic.
+
 ```bash
 curl -i -X POST http://localhost:8001/services/httpbin-service/plugins \
   --data "name=treblle" \
@@ -119,6 +152,8 @@ curl -i -X POST http://localhost:8000/httpbin/post \
   -d '{"test": "v1final3d", "foo": "bar"}'
 ```
 
+At this point, you should be able to go to your Treblle dashboard and see the API request that was just made, complete with all the details captured by the plugin.
+
 ## Configuration Parameters
 
 | Parameter | Default | Description |
@@ -132,7 +167,7 @@ curl -i -X POST http://localhost:8000/httpbin/post \
 | config.max_callback_time_spent | 750 | Limiter on how much time to send events to Treblle per worker cycle |
 | config.request_max_body_size_limit | 100000 | Maximum request body size in bytes to log |
 | config.response_max_body_size_limit | 100000 | Maximum response body size in bytes to log |
-| config.event_queue_size | 100000 | Maximum number of events to hold in queue before sending to Treblle |
+| config.event_queue_size | 100000 | Maximum number of events to hold in the queue before sending to Treblle |
 | config.debug | false | If set to true, prints internal log messages for debugging integration issues |
 | config.enable_compression | false | If set to true, requests are compressed before sending to Treblle |
 | config.max_retry_count | 1 | Retry count to send the payload to the Treblle API |
@@ -153,3 +188,17 @@ curl -i -X POST http://localhost:8001/services/httpbin-service/plugins \
 ```
 
 **Note**: If you already have Treblle installed, you must update the configuration of the existing instance rather than installing Treblle twice.
+
+## Community
+
+First and foremost, **Star and watch this repository** to stay up-to-date.
+
+Also, follow our [Blog](https://blog.treblle.com), and on [Twitter](https://twitter.com/treblleapi).
+
+You can chat with the team and other members on [Discord](https://treblle.com/chat) and follow our tutorials and other video material at [YouTube](https://youtube.com/@treblle).
+
+[![Treblle Discord](https://img.shields.io/badge/Treblle%20Discord-Join%20our%20Discord-F3F5FC?labelColor=7289DA&style=for-the-badge&logo=discord&logoColor=F3F5FC&link=https://treblle.com/chat)](https://treblle.com/chat)
+
+[![Treblle YouTube](https://img.shields.io/badge/Treblle%20YouTube-Subscribe%20on%20YouTube-F3F5FC?labelColor=c4302b&style=for-the-badge&logo=YouTube&logoColor=F3F5FC&link=https://youtube.com/@treblle)](https://youtube.com/@treblle)
+
+[![Treblle on Twitter](https://img.shields.io/badge/Treblle%20on%20Twitter-Follow%20Us-F3F5FC?labelColor=1DA1F2&style=for-the-badge&logo=Twitter&logoColor=F3F5FC&link=https://twitter.com/treblleapi)](https://twitter.com/treblleapi)
