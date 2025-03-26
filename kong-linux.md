@@ -15,7 +15,6 @@ kong-treblle-sandbox/
 
 - Docker Desktop
 - Docker Compose
-- Basic understanding of API gateways
 
 ## 📋 Configuration Files
 
