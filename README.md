@@ -56,9 +56,9 @@ The Kong API Gateway plugin for Treblle captures API requests in real time and s
 - `plugin`: a plugin executing actions inside Kong before or after a request has been proxied to the upstream API.
 - `Service`: the Kong entity representing an external upstream API or microservice.
 - `Route`: The Kong entity represents a way to map downstream requests to upstream services.
-- `Consumer`: the Kong entity representing a developer or machine using the API. When using Kong, a Consumer only communicates with Kong which proxies every call to the said upstream API.
-- `Credential`: a unique string associated with a Consumer, also referred to as an API key.
-upstream service: this refers to your own API/service sitting behind Kong, to which client requests are forwarded.
+- `Consumer`: the Kong entity representing a developer or machine using the API. When using Kong, a Consumer only communicates with Kong, which proxies every call to the upstream API.
+- `Credential`: a unique string associated with a Consumer, also called an API key.
+- `Upstream service`: refers to your own API/service sitting behind Kong, to which client requests are forwarded.
 - `API`: a legacy entity representing your upstream services. Deprecated in favor of Services since CE 0.13.0 and EE 0.32.
 
 # Installation on macOS Using Docker
