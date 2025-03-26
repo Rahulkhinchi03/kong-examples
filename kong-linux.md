@@ -1,6 +1,6 @@
+# Installation on Linux Using Docker
 
-
-## 📁 Project Structure
+### Project Structure
 
 ```
 kong-treblle-sandbox/
@@ -11,12 +11,13 @@ kong-treblle-sandbox/
 └── kong.yml
 ```
 
-## 🛠 Prerequisites
+### Prerequisites
 
-- Docker Desktop
-- Docker Compose
+- Docker Desktop installed on your Mac
+- Git installed
+- A Treblle account with an API key and Project ID
 
-## 📋 Configuration Files
+## Configuration Files
 
 ### 1. Dockerfile
 
@@ -133,7 +134,7 @@ services:
          - /test
 ```
 
-## 🚀 Installation Steps
+## Installation Steps
 
 ### 1. Prepare Project Directory
 
@@ -177,7 +178,7 @@ curl -i -X POST http://localhost:9001/services/httpbin-service/plugins \
   --data "config.mask_keywords[]=Secure-Token"
 ```
 
-## 🔍 Troubleshooting
+## Troubleshooting
 
 ### Verification Commands
 
@@ -192,7 +193,7 @@ docker-compose logs kong
 curl -X POST http://localhost:9000/test/post
 ```
 
-## 🧹 Cleanup
+## Cleanup
 
 ```bash
 # Stop and remove containers
@@ -201,18 +202,3 @@ docker-compose down
 # Remove volumes (optional)
 docker-compose down -v
 ```
-
-## 📝 Notes
-
-### Plugin Configuration Options
-
-- **Masking Keywords**:
-  - `Authorization`: Masks authorization tokens
-  - `API_Key`: Masks API keys
-  - `Secure-Token`: Masks sensitive tokens
-
-### Advanced Configuration
-
-- `debug`: Enable detailed logging
-- `max_retry_count`: Configure retry attempts
-- `event_queue_size`: Control event logging queue
